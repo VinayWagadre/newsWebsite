@@ -164,16 +164,50 @@ async function fetchTopNews() {
             categoryItem.href = url;
             categoryItem.classList.add("category-item");
             categoryItem.textContent = category;
-    
+                 
             // Optional: prevent full reload (SPA-style navigation)
-            categoryItem.addEventListener("click", (event) => {
+            categoryItem.addEventListener("click", async (event) => {
                 event.preventDefault();
-                renderCategoryNews(url); // ← This calls your fetch and render logic
+            
+                console.log("Click event noted");
+                console.log(url);
+            
+                history.pushState({ url: url }, "", url);
+            
+                await fetchCategoryNews(url);
+            
+                // Scroll after content is fetched and rendered
+                document.getElementById("main-content").scrollIntoView({ behavior: "smooth" });
             });
+            
     
             targetElement.appendChild(categoryItem);
         });
     }
+
+    // This runs when the user presses the back or forward button
+    window.onpopstate = (event) => {
+        console.log("onpopstate fired!");
+    
+        let path = window.location.pathname;
+    
+        // Normalize for file-based projects (optional if using a server)
+        if (path.endsWith("index.html")) {
+            path = "/";
+        }
+    
+        if (path === "/") {
+            console.log("User went back to home (index.html)");
+            fetchTopNews(); // ← Call your default home content fetcher
+        } else if (event.state && event.state.url) {
+            console.log("Back/Forward to:", event.state.url);
+            fetchCategoryNews(event.state.url);
+        } else {
+            console.log("No state found, fallback to homepage");
+            fetchTopNews();
+        }
+    };
+    
     
     
 
@@ -212,3 +246,17 @@ async function fetchTopNews() {
     await fetchCategories(sidebarCategories);    // Sidebar
     await fetchTopNews();
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
