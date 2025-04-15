@@ -32,7 +32,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Setup slider dynamically
     async function setupSlider() {
-        const newsData = await fetchNews(`${BASE_URL}/news/home`);
+        let currentPage = 0;
+const newsData = await fetchNews(`${BASE_URL}/news/home?page=${currentPage}`);
+
         if (!newsData.length) return;
 
         slider.innerHTML = "";
@@ -130,18 +132,43 @@ async function fetchTopNews() {
 
     // Fetch Categories
     async function fetchCategories(targetElement) {
-        const categories = ["Home", "देश", "दुनिया", "मनोरंजन", "क्रिकेट", "कारोबार", "नौकरी", "शिक्षा","टेक्नोलॉजी","ऑटो","ज्योतिष","खेल","हेल्थ एंड फिटनेस","फैशन","आस्था","बॉलीवुड","इंदौर","मध्य प्रदेश","मुंबई","दिल्ली","भोपाल",];
+        const categories = [
+            { category: "Home", url: "/" },
+            { category: "देश", url: "/india-news" },
+            { category: "दुनिया", url: "/world" },
+            { category: "मनोरंजन", url: "/entertainment" },
+            { category: "क्रिकेट", url: "/cricket" },
+            { category: "कारोबार", url: "/business" },
+            { category: "नौकरी", url: "/jobs" },
+            { category: "शिक्षा", url: "/education" },
+            { category: "टेक्नोलॉजी", url: "/technology" },
+            { category: "ऑटो", url: "/automobiles" },
+            { category: "ज्योतिष", url: "/astrology" },
+            { category: "खेल", url: "/sports" },
+            { category: "हेल्थ एंड फिटनेस", url: "/fitness" },
+            { category: "फैशन", url: "/fashion" },
+            { category: "शक्ति", url: "/shakti" },
+            { category: "आस्था", url: "/spirituality" },
+            { category: "बॉलीवुड", url: "/bollywood" },
+            { category: "इंदौर", url: "/indore" },
+            { category: "मध्य प्रदेश", url: "/madhya-pradesh" },
+            { category: "मुंबई", url: "/mumbai" },
+            { category: "दिल्ली", url: "/delhi" },
+            { category: "भोपाल", url: "/bhopal" },
+        ];
+    
         targetElement.innerHTML = "";
     
-        categories.forEach(category => {
+        categories.forEach(({ category, url }) => {
             const categoryItem = document.createElement("a");
-            categoryItem.href = `category.html?category=${encodeURIComponent(category)}`;
+            categoryItem.href = url;
             categoryItem.classList.add("category-item");
             categoryItem.textContent = category;
     
-            categoryItem.addEventListener("click", function (event) {
+            // Optional: prevent full reload (SPA-style navigation)
+            categoryItem.addEventListener("click", (event) => {
                 event.preventDefault();
-                window.location.href = `category.html?category=${encodeURIComponent(category)}`;
+                renderCategoryNews(url); // ← This calls your fetch and render logic
             });
     
             targetElement.appendChild(categoryItem);
